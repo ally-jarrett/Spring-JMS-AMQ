@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:appContext.xml")
+@ContextConfiguration(locations = "classpath:appContext-test.xml")
 public class JMSSpringTest {
 
 	@Resource

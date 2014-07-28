@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs" default-lazy-init="false"
+	xmlns="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation=" http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://cxf.apache.org/jaxrs
+  http://cxf.apache.org/schemas/jaxrs.xsd">
+
+	<!-- Standard AMQ Connection Factory Class -->
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<!-- Failover Protocol, randomize=false means it will always try to connect to the first host first!  -->
+		<property name="brokerURL" value="vm://localhost?broker.persistent=false" />
+		<property name="userName" value="admin" />
+		<property name="password" value="admin" />
+	</bean>
+
+	<!-- You can use Spring's CachedConnectionFactory for a more generic implementation -->
+	<bean id="pooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="maxConnections" value="10" />
+		<property name="maximumActiveSessionPerConnection" value="10" /> 
+	</bean>
+
+	<!-- Spring's JMS Template used to Manage Sessions and Connections -->
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="pooledConnectionFactory" />
+		<property name="sessionAcknowledgeModeName" value="AUTO_ACKNOWLEDGE" /> 
+		<property name="sessionTransacted" value="false"/>
+	</bean>
+	
+	<!-- Basic AMQ Q impl -->
+	<bean id="mailDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="mail.queue" />
+	</bean>
+
+	<bean id="textDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="text.queue" />
+	</bean>
+
+	<!-- Producer Bean -->
+	<bean id="producer" class="com.spring.test.activemq.MessageProducerBean">
+		<property name="destination" ref="mailDestination" />
+		<property name="jmsTemplate" ref="jmsTemplate" />
+		<property name="textDestination" ref="textDestination" />
+	</bean>
+
+	<!-- Consumer Bean -->
+	<bean id="consumer" class="com.spring.test.activemq.MessageConsumerBean">
+		<property name="destination" ref="mailDestination" />
+		<property name="jmsTemplate" ref="jmsTemplate" />
+		<property name="textDestination" ref="textDestination" />
+	</bean>
+
+</beans>
+     
