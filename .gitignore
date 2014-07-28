@@ -26,4 +26,6 @@ local.properties
 .buildpath
 
 # Target Folder
-*/target/** 
+*/target/**
+*/target/*
+ 
